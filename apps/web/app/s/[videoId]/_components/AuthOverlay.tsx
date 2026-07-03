@@ -150,6 +150,19 @@ const StepOne = ({
 			callbackUrl: `${window.location.origin}/s/${videoId}`,
 		});
 	};
+	const handleGithubSignIn = () => {
+		trackEvent("auth_started", {
+			method: "github",
+			is_signup: false,
+			auth_surface: "share_overlay",
+			video_id: videoId,
+		});
+		setLoading(true);
+		signIn("github", {
+			redirect: false,
+			callbackUrl: `${window.location.origin}/s/${videoId}`,
+		});
+	};
 	const publicEnv = usePublicEnv();
 
 	return (
@@ -224,23 +237,37 @@ const StepOne = ({
 						: "Email sent to your inbox"
 					: "Continue with Email"}
 			</Button>
-			{publicEnv.googleAuthAvailable && (
+			{(publicEnv.googleAuthAvailable || publicEnv.githubAuthAvailable) && (
 				<>
 					<div className="flex gap-4 items-center">
 						<span className="flex-1 h-px bg-gray-5" />
 						<p className="text-sm text-center text-gray-10">OR</p>
 						<span className="flex-1 h-px bg-gray-5" />
 					</div>
-					<Button
-						variant="gray"
-						type="button"
-						className="flex gap-2 justify-center items-center my-1 w-full text-sm"
-						onClick={handleGoogleSignIn}
-						disabled={loading}
-					>
-						<Image src="/google.svg" alt="Google" width={16} height={16} />
-						Login with Google
-					</Button>
+					{publicEnv.googleAuthAvailable && (
+						<Button
+							variant="gray"
+							type="button"
+							className="flex gap-2 justify-center items-center my-1 w-full text-sm"
+							onClick={handleGoogleSignIn}
+							disabled={loading}
+						>
+							<Image src="/google.svg" alt="Google" width={16} height={16} />
+							Login with Google
+						</Button>
+					)}
+					{publicEnv.githubAuthAvailable && (
+						<Button
+							variant="gray"
+							type="button"
+							className="flex gap-2 justify-center items-center my-1 w-full text-sm"
+							onClick={handleGithubSignIn}
+							disabled={loading}
+						>
+							<Image src="/github.svg" alt="GitHub" width={16} height={16} />
+							Login with GitHub
+						</Button>
+					)}
 				</>
 			)}
 		</form>

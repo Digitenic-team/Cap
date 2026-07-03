@@ -39,20 +39,28 @@ describe("mobile API contract schemas", () => {
 	it("decodes auth provider availability", () => {
 		const decoded = Schema.decodeUnknownSync(Mobile.MobileAuthConfigResponse)({
 			googleAuthAvailable: true,
+			githubAuthAvailable: true,
 			workosAuthAvailable: false,
 		});
 
 		expect(decoded.googleAuthAvailable).toBe(true);
+		expect(decoded.githubAuthAvailable).toBe(true);
 		expect(decoded.workosAuthAvailable).toBe(false);
 	});
 
-	it("accepts Google and WorkOS mobile session providers", () => {
+	it("accepts Google, GitHub and WorkOS mobile session providers", () => {
 		expect(
 			Schema.decodeUnknownSync(Mobile.MobileSessionRequestParams)({
 				redirectUri: "cap://auth",
 				provider: "google",
 			}).provider,
 		).toBe("google");
+		expect(
+			Schema.decodeUnknownSync(Mobile.MobileSessionRequestParams)({
+				redirectUri: "cap://auth",
+				provider: "github",
+			}).provider,
+		).toBe("github");
 		expect(
 			Schema.decodeUnknownSync(Mobile.MobileSessionRequestParams)({
 				redirectUri: "cap://auth",

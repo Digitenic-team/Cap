@@ -44,6 +44,7 @@ type AuthState = {
 const AuthContext = createContext<AuthState | null>(null);
 const fallbackAuthConfig: MobileAuthConfigResponse = {
 	googleAuthAvailable: true,
+	githubAuthAvailable: false,
 	workosAuthAvailable: true,
 };
 

@@ -17,6 +17,7 @@ type JsonNode = ReactTestRendererJSON | ReactTestRendererJSON[] | string | null;
 const authFns = vi.hoisted(() => ({
 	authConfig: {
 		googleAuthAvailable: true,
+		githubAuthAvailable: false,
 		workosAuthAvailable: true,
 	},
 	requestEmailCode: vi.fn(() => Promise.resolve()),

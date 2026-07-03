@@ -5,6 +5,7 @@ import { createContext, type PropsWithChildren, useContext } from "react";
 type PublicEnvContext = {
 	webUrl: string;
 	googleAuthAvailable: boolean;
+	githubAuthAvailable: boolean;
 	workosAuthAvailable: boolean;
 };
 

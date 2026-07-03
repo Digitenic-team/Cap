@@ -7,6 +7,7 @@ import { getServerSession as _getServerSession } from "next-auth";
 import type { Adapter } from "next-auth/adapters";
 import { decode, type JWT, type JWTDecodeParams } from "next-auth/jwt";
 import EmailProvider from "next-auth/providers/email";
+import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import type { Provider } from "next-auth/providers/index";
 import WorkOSProvider from "next-auth/providers/workos";
@@ -82,6 +83,15 @@ export const authOptions = (): NextAuthOptions => {
 						},
 					},
 				}),
+				GitHubProvider({
+					clientId: serverEnv().GITHUB_CLIENT_ID as string,
+					clientSecret: serverEnv().GITHUB_CLIENT_SECRET as string,
+					authorization: { params: { scope: "read:user user:email" } },
+					// Auto-link GitHub to an existing user with the same email (e.g. one
+					// created via email OTP). Safe for GitHub because the `user:email`
+					// scope only returns the account's *verified* primary email.
+					allowDangerousEmailAccountLinking: true,
+				}),
 				WorkOSProvider({
 					clientId: serverEnv().WORKOS_CLIENT_ID as string,
 					clientSecret: serverEnv().WORKOS_API_KEY as string,
@@ -101,7 +111,7 @@ export const authOptions = (): NextAuthOptions => {
 						return crypto.randomInt(100000, 1000000).toString();
 					},
 					async sendVerificationRequest({ identifier, token }) {
-						if (!serverEnv().RESEND_API_KEY) {
+						if (!serverEnv().RESEND_API_KEY && !serverEnv().SMTP_HOST) {
 							console.log("\n");
 							console.log(
 								"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",

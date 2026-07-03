@@ -26,6 +26,7 @@ const apiMock = vi.hoisted(() => ({
 	getAuthConfig: vi.fn(() =>
 		Promise.resolve({
 			googleAuthAvailable: true,
+			githubAuthAvailable: false,
 			workosAuthAvailable: true,
 		}),
 	),
@@ -116,6 +117,7 @@ describe("AuthProvider", () => {
 		apiMock.getAuthConfig.mockReset();
 		apiMock.getAuthConfig.mockResolvedValue({
 			googleAuthAvailable: true,
+			githubAuthAvailable: false,
 			workosAuthAvailable: true,
 		});
 	});
