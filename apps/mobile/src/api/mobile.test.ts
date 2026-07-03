@@ -67,6 +67,7 @@ describe("createMobileApiClient", () => {
 			return new Response(
 				JSON.stringify({
 					googleAuthAvailable: false,
+					githubAuthAvailable: false,
 					workosAuthAvailable: true,
 				}),
 				{ status: 200 },

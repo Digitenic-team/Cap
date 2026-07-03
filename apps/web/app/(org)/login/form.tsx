@@ -50,6 +50,7 @@ export function LoginForm() {
 		null,
 	);
 	const mobileGoogleSignInStarted = useRef(false);
+	const mobileGithubSignInStarted = useRef(false);
 	const mobileWorkosSignInStarted = useRef(false);
 	const loginFormMounted = useRef(false);
 	const theme = Cookies.get("theme") || "light";
@@ -136,6 +137,18 @@ export function LoginForm() {
 		});
 	}, [getNextPath]);
 
+	const handleGithubSignIn = useCallback(() => {
+		const nextPath = getNextPath();
+		trackEvent("auth_started", {
+			method: "github",
+			is_signup: false,
+			auth_surface: "login",
+		});
+		signIn("github", {
+			...(nextPath ? { callbackUrl: nextPath } : {}),
+		});
+	}, [getNextPath]);
+
 	const handleWorkosSignIn = useCallback(
 		async (orgId: string) => {
 			const nextPath = getNextPath();
@@ -160,6 +173,13 @@ export function LoginForm() {
 			return;
 		}
 
+		if (searchParams?.get("mobileProvider") === "github") {
+			if (mobileGithubSignInStarted.current) return;
+			mobileGithubSignInStarted.current = true;
+			handleGithubSignIn();
+			return;
+		}
+
 		if (searchParams?.get("mobileProvider") !== "workos") return;
 		const mobileOrganizationId = searchParams.get("organizationId");
 		if (!mobileOrganizationId) {
@@ -175,7 +195,12 @@ export function LoginForm() {
 			setShowOrgInput(true);
 			toast.error("Organization not found or SSO not configured");
 		});
-	}, [handleGoogleSignIn, handleWorkosSignIn, searchParams]);
+	}, [
+		handleGoogleSignIn,
+		handleGithubSignIn,
+		handleWorkosSignIn,
+		searchParams,
+	]);
 
 	const handleOrganizationLookup = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -354,6 +379,7 @@ export function LoginForm() {
 											loading={loading}
 											oauthError={oauthError}
 											handleGoogleSignIn={handleGoogleSignIn}
+											handleGithubSignIn={handleGithubSignIn}
 										/>
 									</motion.form>
 								)}
@@ -435,6 +461,7 @@ const NormalLogin = ({
 	loading,
 	oauthError,
 	handleGoogleSignIn,
+	handleGithubSignIn,
 }: {
 	setShowOrgInput: (show: boolean) => void;
 	email: string;
@@ -443,6 +470,7 @@ const NormalLogin = ({
 	loading: boolean;
 	oauthError: boolean;
 	handleGoogleSignIn: () => void;
+	handleGithubSignIn: () => void;
 }) => {
 	const publicEnv = usePublicEnv();
 	const emailInputId = useId();
@@ -501,7 +529,9 @@ const NormalLogin = ({
 				</Link>
 			</motion.p>
 
-			{(publicEnv.googleAuthAvailable || publicEnv.workosAuthAvailable) && (
+			{(publicEnv.googleAuthAvailable ||
+				publicEnv.githubAuthAvailable ||
+				publicEnv.workosAuthAvailable) && (
 				<>
 					<div className="flex gap-4 items-center mt-4 mb-4">
 						<span className="flex-1 h-px bg-gray-5" />
@@ -522,6 +552,19 @@ const NormalLogin = ({
 							>
 								<Image src="/google.svg" alt="Google" width={16} height={16} />
 								Login with Google
+							</MotionButton>
+						)}
+
+						{publicEnv.githubAuthAvailable && !oauthError && (
+							<MotionButton
+								variant="gray"
+								type="button"
+								className="flex gap-2 justify-center items-center w-full text-sm"
+								onClick={handleGithubSignIn}
+								disabled={loading || emailSent}
+							>
+								<Image src="/github.svg" alt="GitHub" width={16} height={16} />
+								Login with GitHub
 							</MotionButton>
 						)}
 

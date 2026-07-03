@@ -80,6 +80,11 @@ function createServerEnv() {
 			GOOGLE_CLIENT_ID: z.string().optional(),
 			GOOGLE_CLIENT_SECRET: z.string().optional(),
 
+			/// GitHub Auth
+			// Provide these to allow GitHub login
+			GITHUB_CLIENT_ID: z.string().optional(),
+			GITHUB_CLIENT_SECRET: z.string().optional(),
+
 			/// WorkOS SSO
 			// Provide these to use WorkOS for enterprise SSO
 			WORKOS_CLIENT_ID: z.string().optional(),

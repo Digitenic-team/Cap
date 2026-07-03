@@ -1187,6 +1187,7 @@ const ApiLive = HttpApiBuilder.api(Mobile.MobileApiContract).pipe(
 					.handle("getAuthConfig", () =>
 						Effect.succeed({
 							googleAuthAvailable: Boolean(serverEnv().GOOGLE_CLIENT_ID),
+							githubAuthAvailable: Boolean(serverEnv().GITHUB_CLIENT_ID),
 							workosAuthAvailable: Boolean(serverEnv().WORKOS_CLIENT_ID),
 						}),
 					)
@@ -1208,6 +1209,11 @@ const ApiLive = HttpApiBuilder.api(Mobile.MobileApiContract).pipe(
 										loginRedirectUrl.searchParams.set(
 											"mobileProvider",
 											"google",
+										);
+									} else if (urlParams.provider === "github") {
+										loginRedirectUrl.searchParams.set(
+											"mobileProvider",
+											"github",
 										);
 									} else if (urlParams.provider === "workos") {
 										loginRedirectUrl.searchParams.set(

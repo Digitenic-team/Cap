@@ -82,12 +82,13 @@ export const MobileSuccessResponse = Schema.Struct({
 
 export const MobileAuthConfigResponse = Schema.Struct({
 	googleAuthAvailable: Schema.Boolean,
+	githubAuthAvailable: Schema.Boolean,
 	workosAuthAvailable: Schema.Boolean,
 });
 
 export const MobileSessionRequestParams = Schema.Struct({
 	redirectUri: Schema.optional(MobileAuthRedirectUri),
-	provider: Schema.optional(Schema.Literal("google", "workos")),
+	provider: Schema.optional(Schema.Literal("google", "workos", "github")),
 	organizationId: Schema.optional(Schema.String),
 });
 
