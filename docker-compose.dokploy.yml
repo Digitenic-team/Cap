@@ -5,9 +5,12 @@ services:
     container_name: cap-web
     # Build YOUR fork from source (includes GitHub OAuth + SMTP).
     # Do NOT use the upstream ghcr.io/capsoftware/cap-web image here.
+    # target MUST be pinned: the Dockerfile's last stage is `proxy` (Caddy),
+    # and an unset target would build that instead of the Node server.
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      target: runner
     restart: unless-stopped
     depends_on:
       mysql:
