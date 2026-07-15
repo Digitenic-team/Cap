@@ -56,6 +56,13 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
 
+      # --- Chrome extension auth ---
+      # Required for the Cap browser extension to connect to a self-hosted
+      # instance. Without it, the extension auth flow is only allowed on
+      # localhost and self-hosted deployments reject it with a 400.
+      # Defaults to the official Chrome Web Store extension ID.
+      CAP_CHROME_EXTENSION_ID: ${CAP_CHROME_EXTENSION_ID:-fefjaffcodfiogbbngmjkcjpbpclbdcp}
+
       # --- AI features (optional) ---
       DEEPGRAM_API_KEY: ${DEEPGRAM_API_KEY:-}
       GROQ_API_KEY: ${GROQ_API_KEY:-}
