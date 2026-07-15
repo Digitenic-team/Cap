@@ -13,7 +13,11 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm i --fro
 ARG NEXT_PUBLIC_DOCKER_BUILD=true
 ENV NEXT_PUBLIC_WEB_URL=http://localhost:3000
 
-RUN pnpm run build:web
+# Build with webpack, not Turbopack: Turbopack's `output: standalone` build
+# (Next 16) produces a server that doesn't serve the public/ directory, so
+# static assets like /github.svg and /rive/rive.wasm fall through to the app
+# and return HTML. `next build --webpack` restores correct standalone output.
+RUN pnpm exec turbo run build:web:docker --filter=@cap/web
 
 
 # 3. Production image, copy all the files and run next
