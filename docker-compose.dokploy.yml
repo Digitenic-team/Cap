@@ -28,6 +28,12 @@ services:
       # Leave empty for real AWS S3. Set to the endpoint for R2/B2/MinIO, e.g.
       # https://<account>.r2.cloudflarestorage.com
       S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-}
+      # Endpoint used for server-side ops (multipart upload initiate, etc.).
+      # MUST be set for non-AWS providers: it does NOT fall back to
+      # S3_PUBLIC_ENDPOINT in the app, so an unset value silently routes
+      # server-side calls to real AWS S3 and fails with InvalidAccessKeyId.
+      # Defaults to the public endpoint here so the two can't diverge.
+      S3_INTERNAL_ENDPOINT: ${S3_INTERNAL_ENDPOINT:-${S3_PUBLIC_ENDPOINT:-}}
       # false for AWS S3 (virtual-hosted URLs); true for R2/B2/MinIO (path-style)
       S3_PATH_STYLE: ${S3_PATH_STYLE:-false}
 
