@@ -3,19 +3,42 @@ import { z } from "zod";
 export function isEmailAllowedForSignup(
 	email: string,
 	allowedDomainsConfig?: string,
+	allowedEmailsConfig?: string,
 ): boolean {
-	// If no domain restrictions are configured, allow all signups
-	if (!allowedDomainsConfig || allowedDomainsConfig.trim() === "") {
+	const hasDomainConfig =
+		!!allowedDomainsConfig && allowedDomainsConfig.trim() !== "";
+	const hasEmailConfig =
+		!!allowedEmailsConfig && allowedEmailsConfig.trim() !== "";
+
+	// If no restrictions are configured, allow all signups
+	if (!hasDomainConfig && !hasEmailConfig) {
 		return true;
 	}
 
-	const emailDomain = extractDomainFromEmail(email);
-	if (!emailDomain) {
-		return false;
+	const normalizedEmail = email.toLowerCase();
+
+	// Exact email allowlist match
+	if (
+		hasEmailConfig &&
+		parseAllowedEmails(allowedEmailsConfig as string).includes(normalizedEmail)
+	) {
+		return true;
 	}
 
-	const allowedDomains = parseAllowedDomains(allowedDomainsConfig);
-	return allowedDomains.includes(emailDomain.toLowerCase());
+	// Domain allowlist match
+	if (hasDomainConfig) {
+		const emailDomain = extractDomainFromEmail(email);
+		if (
+			emailDomain &&
+			parseAllowedDomains(allowedDomainsConfig as string).includes(
+				emailDomain.toLowerCase(),
+			)
+		) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 function extractDomainFromEmail(email: string): string | null {
@@ -35,6 +58,15 @@ function parseAllowedDomains(allowedDomainsConfig: string): string[] {
 		.split(",")
 		.map((domain) => domain.trim().toLowerCase())
 		.filter((domain) => domain.length > 0 && isValidDomain(domain));
+}
+
+function parseAllowedEmails(allowedEmailsConfig: string): string[] {
+	return allowedEmailsConfig
+		.split(",")
+		.map((email) => email.trim().toLowerCase())
+		.filter(
+			(email) => email.length > 0 && z.string().email().safeParse(email).success,
+		);
 }
 
 function isValidDomain(domain: string): boolean {

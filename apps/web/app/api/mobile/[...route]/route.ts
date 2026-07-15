@@ -295,7 +295,8 @@ const ensureEmailSignInAllowed = Effect.fn("Mobile.ensureEmailSignInAllowed")(
 		}
 
 		const allowedDomains = serverEnv().CAP_ALLOWED_SIGNUP_DOMAINS;
-		if (!allowedDomains) return;
+		const allowedEmails = serverEnv().CAP_ALLOWED_SIGNUP_EMAILS;
+		if (!allowedDomains && !allowedEmails) return;
 
 		const database = yield* Database;
 		const [existingUser] = yield* database.use((db) =>
@@ -306,7 +307,10 @@ const ensureEmailSignInAllowed = Effect.fn("Mobile.ensureEmailSignInAllowed")(
 				.limit(1),
 		);
 
-		if (!existingUser && !isEmailAllowedForSignup(email, allowedDomains)) {
+		if (
+			!existingUser &&
+			!isEmailAllowedForSignup(email, allowedDomains, allowedEmails)
+		) {
 			return yield* Effect.fail(new HttpApiError.Forbidden());
 		}
 	},
