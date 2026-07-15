@@ -76,11 +76,13 @@ services:
     expose:
       - "3000"
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/"]
+      # /api/status returns a plain 200 "OK" with no auth/DB/redirect, so it's
+      # a reliable readiness signal (unlike "/", which auth-redirects).
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/api/status"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 60s
+      retries: 5
+      start_period: 90s
     networks:
       - cap-network
 
@@ -95,9 +97,13 @@ services:
       dockerfile: apps/web/Dockerfile
       target: proxy
     restart: unless-stopped
+    # Only wait for cap-web to *start*, not to be healthy: Caddy serves the
+    # static assets on its own and returns a brief 502 for app routes until
+    # cap-web is ready, so the proxy must never block the deploy on cap-web's
+    # healthcheck.
     depends_on:
       cap-web:
-        condition: service_healthy
+        condition: service_started
     expose:
       - "80"
     healthcheck:
