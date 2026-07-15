@@ -41,3 +41,13 @@ USER nextjs
 EXPOSE 3000
 
 CMD HOSTNAME="0.0.0.0" node apps/web/server.js
+
+
+# 4. Lightweight static-asset proxy (Caddy).
+# Next 16 standalone doesn't serve public/ (assets 307 to /login), so Caddy
+# sits in front: serves any existing public/ file directly and proxies the
+# rest to the Next server. public/ is baked in here at build time.
+FROM caddy:2-alpine AS proxy
+COPY --from=builder /app/apps/web/public /srv/public
+COPY apps/web/Caddyfile /etc/caddy/Caddyfile
+EXPOSE 80

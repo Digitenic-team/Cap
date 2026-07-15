@@ -84,6 +84,31 @@ services:
     networks:
       - cap-network
 
+  # Lightweight Caddy proxy that fronts cap-web. It serves the public/ static
+  # assets directly (Next 16 standalone doesn't) and proxies everything else to
+  # cap-web:3000. Point the Dokploy domain at this service (cap-proxy:80),
+  # NOT at cap-web:3000.
+  cap-proxy:
+    container_name: cap-proxy
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: proxy
+    restart: unless-stopped
+    depends_on:
+      cap-web:
+        condition: service_healthy
+    expose:
+      - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:80/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - cap-network
+
   media-server:
     container_name: cap-media-server
     # You didn't modify the media server, so the upstream prebuilt image is fine.

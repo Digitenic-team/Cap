@@ -1,0 +1,34 @@
+# Static-asset proxy for Cap self-host.
+#
+# Why: Next 16's `output: standalone` server does not serve the public/
+# directory in this build — requests for /github.svg, /rive/rive.wasm, etc.
+# fall through to Cap's auth gate and 307-redirect to /login. Caddy sits in
+# front: it serves any request that maps to an existing file under public/
+# directly, and proxies everything else (pages, /api, /_next/*) to Next.
+#
+# public/ is baked into this image at build time (see Dockerfile `proxy` stage),
+# so links stay as-is (/github.svg) with no code changes.
+
+:80 {
+	encode zstd gzip
+
+	root * /srv/public
+
+	# Health endpoint answered directly by Caddy (no dependency on Next or on
+	# any public asset), so container healthchecks reflect only Caddy's own state.
+	handle /healthz {
+		respond "ok" 200
+	}
+
+	# If the request maps to a real file in public/, serve it directly.
+	@public file
+	handle @public {
+		header Cache-Control "public, max-age=3600"
+		file_server
+	}
+
+	# Everything else -> the Next.js standalone server.
+	handle {
+		reverse_proxy cap-web:3000
+	}
+}
