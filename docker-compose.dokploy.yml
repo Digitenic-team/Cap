@@ -79,12 +79,9 @@ services:
     environment:
       PORT: 3456
       MEDIA_SERVER_WEBHOOK_SECRET: ${MEDIA_SERVER_WEBHOOK_SECRET}
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3456/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+    # No healthcheck override here: the image already defines a working
+    # HEALTHCHECK (bun -e fetch against /health). The previous wget-based
+    # check failed only because the oven/bun image ships no wget.
     networks:
       - cap-network
 
