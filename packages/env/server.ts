@@ -102,6 +102,12 @@ function createServerEnv() {
 				.string()
 				.optional()
 				.describe("Comma-separated list of permitted signup domains"),
+			CAP_ALLOWED_SIGNUP_EMAILS: z
+				.string()
+				.optional()
+				.describe(
+					"Comma-separated list of exact email addresses permitted to sign up/sign in",
+				),
 
 			/// AI providers
 			DEEPGRAM_API_KEY: z.string().optional().describe("Audio transcription"),
