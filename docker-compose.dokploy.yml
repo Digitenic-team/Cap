@@ -57,6 +57,13 @@ services:
       SMTP_PASS: ${SMTP_PASS:-}
       SMTP_FROM: ${SMTP_FROM:-}
 
+      # --- Signup restrictions (optional) ---
+      # Comma-separated allowlists gating who may create a NEW account (any
+      # provider). Must be listed here or the container never receives them,
+      # even when set in the Dokploy env panel (that only feeds ${...} interp).
+      CAP_ALLOWED_SIGNUP_EMAILS: ${CAP_ALLOWED_SIGNUP_EMAILS:-}
+      CAP_ALLOWED_SIGNUP_DOMAINS: ${CAP_ALLOWED_SIGNUP_DOMAINS:-}
+
       # --- OAuth: GitHub ---
       GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
