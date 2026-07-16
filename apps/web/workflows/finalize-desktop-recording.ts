@@ -514,6 +514,10 @@ async function startDesktopSegmentsMuxJob(
 		throw new FatalError("MEDIA_SERVER_URL is not configured");
 	}
 
+	if (!serverEnv().MEDIA_SERVER_WEBHOOK_SECRET) {
+		throw new FatalError("MEDIA_SERVER_WEBHOOK_SECRET is not configured");
+	}
+
 	const body = await buildDesktopSegmentsMuxBody(videoId, userId);
 	const headers: Record<string, string> = {
 		"Content-Type": "application/json",
