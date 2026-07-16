@@ -64,9 +64,11 @@ export async function requestEmailCode({
 	}
 
 	toast.error(
-		response?.error === "EmailSignin"
-			? "Please wait 30 seconds before requesting a new code."
-			: "We could not send a code. Please try again.",
+		response?.error === "AccessDenied"
+			? "This email isn't allowed to sign in. Please contact your administrator."
+			: response?.error === "EmailSignin"
+				? "Please wait 30 seconds before requesting a new code."
+				: "We could not send a code. Please try again.",
 	);
 
 	return null;

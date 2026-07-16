@@ -90,6 +90,10 @@ export function LoginForm() {
 				return toast.error(
 					"Your email domain is not authorized for SSO access. Please use your work email or contact your administrator.",
 				);
+			} else if (error === "AccessDenied" && !errorDesc) {
+				return toast.error(
+					"This email isn't allowed to sign in. Please contact your administrator.",
+				);
 			} else if (error && errorDesc) {
 				return toast.error(errorDesc);
 			}
